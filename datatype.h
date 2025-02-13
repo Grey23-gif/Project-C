@@ -1,8 +1,10 @@
-//import ham. khai bao struct
+#ifndef DATATYPE_H
+#define DATATYPE_H
+
 #include <stdio.h>
 #include <stdbool.h>
 
-typedef struct
+typedef struct  
 {
 	int studentId;
 	char classroom[10];
@@ -11,19 +13,18 @@ typedef struct
 	char email[40];
 	char password[30];
 	char phone[10];
-}Student;
- 
-struct classroom
+} Student;
+
+typedef struct  
 {
 	char classroomId[10];
 	char teacherId[10];
 	char classroomName[10];
-	
-};
+} Classroom;
 
-struct Teacher
+typedef struct  
 {
-	char teacherId[10];
+	int teacherId;
 	char classroomId[10];
 	char name[25];
 	int age;
@@ -31,6 +32,8 @@ struct Teacher
 	char email[40];
 	char phone[10];
 	char password[30];
-	struct classroom classrooms[];
-};
+	Classroom classrooms[5];
+} Teacher;
+
+#endif
 

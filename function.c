@@ -2,8 +2,9 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <string.h>
-#include "function.h"
 #include "datatype.h"
+#include "function.h"
+
 
 #ifdef _WIN32
     #define CLEAR_SCREEN "cls"
@@ -11,9 +12,20 @@
     #define CLEAR_SCREEN "clear"
 #endif
 
-void showMenuStudent() 
-{
-	system(CLEAR_SCREEN);
+void showMenuMain() 	{
+    system(CLEAR_SCREEN);
+    printf("\n============================\n");
+    printf("%17s\n", "MENU");
+    printf("============================\n");
+    printf("[1]. Teacher Menu.\n");
+    printf("[2]. Student Menu.\n");
+    printf("[3]. Classroom Menu.\n");
+    printf("[4]. Exit.\n");
+    printf("Enter your choice: ");
+}
+
+void showMenuStudent() 	{
+    system(CLEAR_SCREEN);
     printf("\n============================\n");
     printf("%19s\n", "STUDENT MENU");
     printf("============================\n");
@@ -22,108 +34,160 @@ void showMenuStudent()
     printf("[3]. Edit a student.\n");
     printf("[4]. Delete a student.\n");
     printf("[5]. Search a student.\n");
-    printf("[6]. Back to main Menu.\n");
+    printf("[6]. Sort students by name.\n");
     printf("[7]. Exit.\n");
     printf("Enter your choice: ");
 }
 
-void showMenuMain() 
-{
-	system(CLEAR_SCREEN);
+void showMenuTeacher() 	{
+    system(CLEAR_SCREEN);
     printf("\n============================\n");
-    printf("%20s\n", "MENU");
+    printf("%19s\n", "Teacher MENU");
     printf("============================\n");
-    printf("[1]. Student Menu.\n");
-    printf("[2]. Teacher Menu.\n");
-    printf("[3]. Classroom Menu.\n");
+    printf("[1]. Add a new student.\n");
+    printf("[2]. Show all students.\n");
+    printf("[3]. Edit a student.\n");
     printf("[4]. Delete a student.\n");
-    printf("[5]. Back to main Menu.\n");
-    printf("[6]. Exit.\n");
+    printf("[5]. Search a student.\n");
+    printf("[6]. Sort students by name.\n");
+    printf("[7]. Exit.\n");
     printf("Enter your choice: ");
 }
 
-
-int getMaxStudentId() {
-    FILE *file = fopen("student.txt", "r"); 
-    if (file == NULL) {
-        return 0; 
-    }
-
-    Student s;
-    int maxId = 0;
-
-    while (fscanf(file, "%d,%49[^,],%d,%49[^,],%14[^\n]\n",
-                  &s.studentId, s.name, &s.age, s.email, s.phone) == 5) {
-        if (s.studentId > maxId) {
-            maxId = s.studentId;
-        }
-    }
-
-    fclose(file);
-    return maxId;
-}
-
-void pressAnyKeyToExit() {
-	 printf("\nNhan phim bat ky de quay lai");
-	
-    #ifdef _WIN32
-        getch(); // Windows
-    #else
-        printf("\n");
-        getchar(); // Linux/macOS: d?c ký t? Enter còn sót
-        getchar(); // Ð?i ngu?i dùng nh?p phím b?t k?
-    #endif
+void pressBToExit() {
+    char ch;
+    printf("\nPress 'B' to go back to the menu...");
+    while ((ch = getchar()) != 'B' && ch != 'b' && ch != '\n');
 }
 
 void addStudent() {
-	system(CLEAR_SCREEN);
-    int newId = getMaxStudentId() + 1;
-
-    FILE *file = fopen("student.txt", "a"); 
-    if (file == NULL) {
-        perror("Loi mo file");
+    system(CLEAR_SCREEN);
+    FILE *file = fopen("student.bin", "ab+"); // M? file d?c và ghi
+    if (!file) {
+        perror("Error opening file");
         exit(1);
     }
-
+    
     Student s;
-    s.studentId = newId;
+    int check;
+    Student temp;
 
-    printf("ID : %d\n", s.studentId);
-    getchar();
+    do {
+        check = 1; //Vi du la du lieu hop le
+        // Nhap ID
+        printf("Nhap ID: ");
+        if (scanf("%d", &s.studentId) != 1 || s.studentId <= 0) 
+		{
+            printf("ID khong hop le.\n");
+            check = 0;
+            while (getchar() != '\n');
+            continue;
+        }
+        getchar(); // Xóa bo no dem
+        
+        //ktra ID co lap k
+        
+        rewind(file); //Dua con tro file ve dau
+        while (fread(&temp, sizeof(Student), 1, file)) 
+		{
+            if (temp.studentId == s.studentId) 
+			{
+                printf("ID da ton tai.\n");
+                check = 0;
+            }
+		}
+		}while(!check);
+        // Nhap ten
+        printf("Nhap ten: ");
+        fgets(s.name, sizeof(s.name), stdin);
+        s.name[strcspn(s.name, "\n")] = '\0'; 
+
+        // Nhap tuoi
+        do
+		{
+		check=1;
+        printf("Nhap tuoi: ");
+        if (scanf("%d", &s.age) != 1 || s.age <= 0) {
+            printf("Tuoi khong hop le.\n");
+            check = 0;
+        }
+        getchar();
+    	}while(!check);
+		
+		do
+		{
+		check=1;
+       //nhap email va ktra email
+        printf("Nhap email: ");
+        fgets(s.email, sizeof(s.email), stdin);
+        s.email[strcspn(s.email, "\n")] = '\0';
+        if (strlen(s.email) == 0 || strstr(s.email,"@gmail.com") == NULL) {
+            printf("Email không hop le?!\n");
+            check = 0;
+        }
+
+        // Kiem tra email co trung khong
+        rewind(file);
+        while (fread(&temp, sizeof(Student), 1, file)) 
+		{
+            if (strcmp(temp.email, s.email) == 0) 
+			{
+                printf("Email da ton tai!\n");
+                check = 0;
+                break;
+            }
+        }
+    	}while(!check);
+
+        //Nhap so dien thoat va ktra co hop le k
+        do
+        {
+        printf("Nhap so dien thoai: ");
+        fgets(s.phone, sizeof(s.phone), stdin);
+        s.phone[strcspn(s.phone, "\n")] = '\0';
+        int length = strlen(s.phone);
+        if (length < 9 || length > 11) {
+            printf("So dien thoai khong hop le\n");
+            check = 0;
+        }
+        int i;	
+        for (i = 0; i < length; i++) {
+        if (!isdigit(s.phone[i])) {
+            printf("So dien thoai chi duoc chua cac chu so (0-9).\n");
+            check=0;
+            break;
+        }
+    	}
+		
+       //ktra xem SÐT có trùng không
+        rewind(file);
+        while (fread(&temp, sizeof(Student), 1, file))
+		 {
+            if (strcmp(temp.phone, s.phone) == 0) 
+			{
+                printf("So dien thoat da ton tai!\n");
+                check = 0;
+                break;
+            }
+        }
+        }while(!check);
+
    
-    printf("Nhap ho va ten sinh vien: ");
-    fgets(s.name, sizeof(s.name), stdin);
-    s.name[strcspn(s.name, "\n")] = '\0';
-
-    printf("Nhap tuoi: ");
-    scanf("%d", &s.age);
-    getchar();
-
-    printf("Nhap email: ");
-    fgets(s.email, sizeof(s.email), stdin);
-    s.email[strcspn(s.email, "\n")] = '\0';
-
-    printf("Nhap so dien thoai: ");
-    fgets(s.phone, sizeof(s.phone), stdin);
-    s.phone[strcspn(s.phone, "\n")] = '\0';
-
-    
-    fprintf(file, "%d,%s,%d,%s,%s\n", s.studentId, s.name, s.age, s.email, s.phone);
-    
-    printf("Them sinh vien thanh cong!\n");
-
+    // Luu thông tin hop le vào file
+    fwrite(&s, sizeof(Student), 1, file);
     fclose(file);
-    pressAnyKeyToExit();
+    
+    printf("Sinh vien duoc them thanh cong.\n");
+    pressBToExit();
 }
 
 
-void displayStudents()  
-{
-	system(CLEAR_SCREEN);
-    FILE *file = fopen("student.txt", "r");
-    if (file == NULL) 
-    {
+void displayStudents() {
+    system(CLEAR_SCREEN);
+    FILE *file = fopen("student.bin", "rb"); 
+    if (file == NULL) {
         printf("Khong co du lieu sinh vien!\n");
+        pressBToExit();
         return;
     }
 
@@ -134,166 +198,145 @@ void displayStudents()
     printf("\n|%-5s|%-20s|%-10s|%-20s|%-20s|", "ID", "Ho va Ten", "Tuoi", "Email", "SDT");
     printf("\n|-----|--------------------|----------|--------------------|--------------------|");
 
-    while (fscanf(file, "%d,%49[^,],%d,%49[^,],%14[^\n]\n",
-                  &s.studentId, s.name, &s.age, s.email, s.phone) == 5) 
-    {
+    while (fread(&s, sizeof(Student), 1, file) == 1) { 
         hasData = 1;
         printf("\n|%-5d|%-20s|%-10d|%-20s|%-20s|",
                s.studentId, s.name, s.age, s.email, s.phone);
         printf("\n|-----|--------------------|----------|--------------------|--------------------|");
     }
-
-    if (!hasData) 
-    {
-        printf("\nKhong co sinh vien nao trong danh sach.\n");
+    
+    fclose(file);
+    
+    if (!hasData) {
+        printf("\nKhông có sinh viên nào trong danh sách.\n");
     }
 
-    fclose(file);
-    pressAnyKeyToExit();
+    pressBToExit();
 }
 
+
 void editStudent() {
-	system(CLEAR_SCREEN);
-    FILE *file = fopen("student.txt", "r");
-    if (file == NULL) {
+	 system(CLEAR_SCREEN);
+    FILE *file = fopen("student.bin", "rb");
+    if (!file) {
         printf("Khong co du lieu sinh vien!\n");
         return;
     }
+    
+    FILE *tempFile = fopen("temp.bin", "wb");
+    if (!tempFile) {
+        fclose(file);
+        perror("Loi tao file moi");
+        return;
+    }
 
-    int id;
+    int id, found = 0;
     printf("Nhap ID sinh vien can sua: ");
     scanf("%d", &id);
     getchar();
 
     Student s;
-    int found = 0;
-
-    FILE *tempFile = fopen("temp.txt", "w"); 
-    if (tempFile == NULL) {
-        printf("Loi mo file tam thoi!\n");
-        fclose(file);
-        return;
-    }
-
-    while (fscanf(file, "%d,%49[^,],%d,%49[^,],%14[^\n]\n",
-                  &s.studentId, s.name, &s.age, s.email, s.phone) == 5) {
+    while (fread(&s, sizeof(Student), 1, file)) {
         if (s.studentId == id) {
             found = 1;
-            printf("Nhap ho va ten sinh vien moi: ");
+            printf("Nhap ten: ");
             fgets(s.name, sizeof(s.name), stdin);
             s.name[strcspn(s.name, "\n")] = '\0';
 
-            printf("Nhap tuoi moi: ");
+            printf("Nhap tuoi: ");
             scanf("%d", &s.age);
             getchar();
 
-            printf("Nhap email moi: ");
+            printf("Nhap email: ");
             fgets(s.email, sizeof(s.email), stdin);
             s.email[strcspn(s.email, "\n")] = '\0';
 
-            printf("Nhap so dien thoai moi: ");
+            printf("Nhap SDT: ");
             fgets(s.phone, sizeof(s.phone), stdin);
             s.phone[strcspn(s.phone, "\n")] = '\0';
         }
-
-    
-        fprintf(tempFile, "%d,%s,%d,%s,%s\n", s.studentId, s.name, s.age, s.email, s.phone);
+        fwrite(&s, sizeof(Student), 1, tempFile);
     }
 
     fclose(file);
     fclose(tempFile);
 
+    remove("student.bin");
+    rename("temp.bin", "student.bin");
+
     if (found) {
-        remove("student.txt");
-        rename("temp.txt", "student.txt");
-        printf("Sua thong tin thanh cong!\n"); 
+        printf("Da thay doi thong tinh sinh vien!\n");
     } else {
-        printf("Khong tim thay sinh vien co ID %d!\n", id);
-        remove("temp.txt"); 
+        printf("ID sinh vien khong tim thay!\n");
     }
-    pressAnyKeyToExit();
+    pressBToExit();
 }
 
-
 void deleteStudent() {
-	system(CLEAR_SCREEN);
-    FILE *file = fopen("student.txt", "r");
-    if (file == NULL) {
+	 system(CLEAR_SCREEN);
+    FILE *file = fopen("student.bin", "rb");
+    if (!file) {
         printf("Khong co du lieu sinh vien!\n");
         return;
     }
 
-    int id;
+    FILE *tempFile = fopen("temp.bin", "wb");
+    if (!tempFile) {
+        fclose(file);
+        perror("Loi tao file moi");
+        return;
+    }
+
+    int id, found = 0;
     printf("Nhap ID sinh vien can xoa: ");
     scanf("%d", &id);
     getchar();
 
     Student s;
-    int found = 0;
-
-    FILE *tempFile = fopen("temp.txt", "w"); // ?? M? file t?m
-    if (tempFile == NULL) {
-        printf("Loi mo file tam thoi!\n");
-        fclose(file);
-        return;
-    }
-
-    while (fscanf(file, "%d,%49[^,],%d,%49[^,],%14[^\n]\n",
-                  &s.studentId, s.name, &s.age, s.email, s.phone) == 5) {
+    while (fread(&s, sizeof(Student), 1, file)) {
         if (s.studentId == id) {
             found = 1;
-            printf("\n?? Ban co chac chan muon xoa sinh vien nay? (Y/N): ");
-            char confirm;
-            scanf(" %c", &confirm);
-            getchar(); 
-
-            if (confirm == 'y' || confirm == 'Y') {
-                printf("Sinh vien co ID %d da duoc xoa thanh cong!\n", id);
-                continue; 
-            } else {
-                printf("Huy xoa sinh vien.\n");
-            }
+            printf("Da xoa ID %d thanh cong!\n", id);
+            continue;
         }
-
-        fprintf(tempFile, "%d,%s,%d,%s,%s\n", s.studentId, s.name, s.age, s.email, s.phone);
+        fwrite(&s, sizeof(Student), 1, tempFile);
     }
 
     fclose(file);
     fclose(tempFile);
 
-    if (found) {
-        remove("student.txt");
-        rename("temp.txt", "student.txt");
-    } else {
-        printf("Khong tim thay sinh vien co ID %d!\n", id);
-        remove("temp.txt"); 
+    remove("student.bin");
+    rename("temp.bin", "student.bin");
+
+    if (!found) {
+        printf("Khong tim thay ID sinh vien!\n");
     }
-    pressAnyKeyToExit();
+    pressBToExit();
 }
 
-void searchStudentByName() 
-{
-	system(CLEAR_SCREEN);
-    FILE *file = fopen("student.txt", "r");
-    if (file == NULL) {
-        printf("Khong co du lieu sinh vien!\n");
-        return;
-    }
+void searchStudentByName() {
+    system(CLEAR_SCREEN);
+    FILE *file = fopen("student.bin", "rb");
+	if (file == NULL) {
+    printf("Loi khong the mo file!\n");
+    pressBToExit();
+    return;
+}
+
 
     char searchName[50];
     printf("Nhap ten sinh vien can tim: ");
     fgets(searchName, sizeof(searchName), stdin);
-    searchName[strcspn(searchName, "\n")] = '\0'; 
+    searchName[strcspn(searchName, "\n")] = '\0';  
 
     Student s;
     int found = 0;
 
     printf("\n|-----|--------------------|----------|--------------------|--------------------|");
-    printf("\n|%-5s|%-20s|%-10s|%-20s|%-20s|", "ID", "Ho va Ten", "Tuoi", "Email", "SDT");
+    printf("\n|%-5s|%-20s|%-10s|%-20s|%-20s|", "ID", "Ho va Ten", "Tuoi", "Email", "SÐT");
     printf("\n|-----|--------------------|----------|--------------------|--------------------|");
 
-    while (fscanf(file, "%d,%49[^,],%d,%49[^,],%14[^\n]\n", 
-                  &s.studentId, s.name, &s.age, s.email, s.phone) == 5) {
+    while (fread(&s, sizeof(Student), 1, file) == 1) {  
         if (strstr(s.name, searchName) != NULL) { 
             found = 1;
             printf("\n|%-5d|%-20s|%-10d|%-20s|%-20s|", s.studentId, s.name, s.age, s.email, s.phone);
@@ -302,17 +345,487 @@ void searchStudentByName()
     }
 
     if (!found) {
-        printf("\nKhong tim thay sinh vien nao voi ten chua \"%s\"!\n", searchName);
+        printf("\nKhông tìm thay sinh vien nao co ten \"%s\"!\n", searchName);
     }
 
     fclose(file);
-    pressAnyKeyToExit();
+    pressBToExit();
 }
 
-void swap(Student *a, Student *b) {
-    Student temp = *a;
-    *a = *b;
-    *b = temp;
+int compareAZ(const void *a, const void *b) {
+    Student *s1 = (Student *)a;
+    Student *s2 = (Student *)b;
+    return strcmp(s1->name, s2->name);
+}
+
+
+int compareZA(const void *a, const void *b) {
+    return compareAZ(b, a);
+}
+
+
+void sortsAZ() {
+    system(CLEAR_SCREEN);
+    FILE *file = fopen("student.bin", "rb");
+    if (!file) {
+        printf("Khomg co du lieu sinh vien!\n");
+        pressBToExit();
+        return;
+    }
+
+    Student students[100]; // Khai báo m?ng
+    int count = 0;
+
+    while (fread(&students[count], sizeof(Student), 1, file)) {
+        count++;
+    }
+    fclose(file);
+
+    if (count == 0) {
+        printf("Danh sach sinh vien truong!\n");
+        pressBToExit();
+        return;
+    }
+
+    qsort(students, count, sizeof(Student), compareAZ);
+
+    printf("\n|-----|--------------------|----------|--------------------|--------------------|");
+    printf("\n|%-5s|%-20s|%-10s|%-20s|%-20s|", "ID", "Ho va Ten", "Tuoi", "Email", "SDT");
+    printf("\n|-----|--------------------|----------|--------------------|--------------------|");
+	int i=0;
+    for ( i = 0; i < count; i++) {
+        printf("\n|%-5d|%-20s|%-10d|%-20s|%-20s|",
+               students[i].studentId, students[i].name, students[i].age, students[i].email, students[i].phone);
+        printf("\n|-----|--------------------|----------|--------------------|--------------------|");
+    }
+
+    pressBToExit();
+}
+
+
+
+void sortsZA() {
+    system(CLEAR_SCREEN);
+    FILE *file = fopen("student.bin", "rb");
+    if (!file) {
+        printf("Khong co du lieu sinh vien!\n");
+        pressBToExit();
+        return;
+    }
+
+    Student students[100]; 
+    int count = 0;
+
+    while (fread(&students[count], sizeof(Student), 1, file)) {
+        count++;
+    }
+    fclose(file);
+
+    if (count == 0) {
+        printf("Danh sach sinh vien truong\n");
+        pressBToExit();
+        return;
+    }
+
+    qsort(students, count, sizeof(Student), compareZA);
+
+    printf("\n|-----|--------------------|----------|--------------------|--------------------|");
+    printf("\n|%-5s|%-20s|%-10s|%-20s|%-20s|", "ID", "H? và Tên", "Tu?i", "Email", "SÐT");
+    printf("\n|-----|--------------------|----------|--------------------|--------------------|");
+	int i;
+    for ( i = 0; i < count; i++) {
+        printf("\n|%-5d|%-20s|%-10d|%-20s|%-20s|",
+               students[i].studentId, students[i].name, students[i].age, students[i].email, students[i].phone);
+        printf("\n|-----|--------------------|----------|--------------------|--------------------|");
+    }
+
+    pressBToExit();
+}
+
+
+
+
+
+void addTeacher() {
+    system(CLEAR_SCREEN);
+    FILE *file = fopen("teacher.bin", "ab+"); // Mo file doc và ghi
+    if (!file) {
+        perror("Error opening file");
+        exit(1);
+    }
+    
+    Teacher t;
+    int check;
+    Teacher temp;
+
+    do {
+        check = 1; //Vi du la du lieu hop le
+        // Nhap ID
+        printf("Nhap ID: ");
+        if (scanf("%d", &t.teacherId) != 1 || t.teacherId <= 0) 
+		{
+            printf("ID khong hop le.\n");
+            check = 0;
+            while (getchar() != '\n');
+            continue;
+        }
+        getchar(); // Xóa bo no dem
+        
+        //ktra ID co lap k
+        
+        rewind(file); //Dua con tro file ve dau
+        while (fread(&temp, sizeof(Teacher), 1, file)) 
+		{
+            if (temp.teacherId == t.teacherId) 
+			{
+                printf("ID da ton tai.\n");
+                check = 0;
+            }
+		}
+		}while(!check);
+        // Nhap ten
+        printf("Nhap ten: ");
+        fgets(t.name, sizeof(t.name), stdin);
+        t.name[strcspn(t.name, "\n")] = '\0'; 
+
+        // Nhap tuoi
+        do
+		{
+		check=1;
+        printf("Nhap tuoi: ");
+        if (scanf("%d", &t.age) != 1 || t.age <= 0) {
+            printf("Tuoi khong hop le.\n");
+            check = 0;
+        }
+        getchar();
+    	}while(!check);
+		
+		do
+		{
+		check=1;
+       //nhap email va ktra email
+        printf("Nhap email: ");
+        fgets(t.email, sizeof(t.email), stdin);
+        t.email[strcspn(t.email, "\n")] = '\0';
+        if (strlen(t.email) == 0 || strstr(t.email,"@gmail.com") == NULL) {
+            printf("Email không hop le?!\n");
+            check = 0;
+        }
+
+        // Kiem tra email co trung khong
+        rewind(file);
+        while (fread(&temp, sizeof(Teacher), 1, file)) 
+		{
+            if (strcmp(temp.email, t.email) == 0) 
+			{
+                printf("Email da ton tai!\n");
+                check = 0;
+                break;
+            }
+        }
+    	}while(!check);
+
+        //Nhap so dien thoat va ktra co hop le k
+        do
+        {
+        printf("Nhap so dien thoai: ");
+        fgets(t.phone, sizeof(t.phone), stdin);
+        t.phone[strcspn(t.phone, "\n")] = '\0';
+        int length = strlen(t.phone);
+        if (length < 9 || length > 11) {
+            printf("So dien thoai khong hop le\n");
+            check = 0;
+        }
+        int i;	
+        for (i = 0; i < length; i++) {
+        if (!isdigit(t.phone[i])) {
+            printf("So dien thoai chi duoc chua cac chu so (0-9).\n");
+            check=0;
+            break;
+        }
+    	}
+		
+       //ktra xem SÐT có trùng không
+        rewind(file);
+        while (fread(&temp, sizeof(Teacher), 1, file))
+		 {
+            if (strcmp(temp.phone, t.phone) == 0) 
+			{
+                printf("So dien thoat da ton tai!\n");
+                check = 0;
+                break;
+            }
+        }
+        }while(!check);
+
+   
+    // Luu thông tin hop le vào file
+    fwrite(&t, sizeof(Teacher), 1, file);
+    fclose(file);
+    
+    printf("Giao vien duoc them thanh cong.\n");
+    pressBToExit();
+}
+
+
+void displayTeachers() {
+    system(CLEAR_SCREEN);
+    FILE *file = fopen("teacher.bin", "rb"); 
+    if (file == NULL) {
+        printf("Khong co du lieu giao vien!\n");
+        pressBToExit();
+        return;
+    }
+
+    Teacher t;
+    int hasData = 0;
+
+    printf("\n|-----|--------------------|----------|--------------------|--------------------|");
+    printf("\n|%-5s|%-20s|%-10s|%-20s|%-20s|", "ID", "Ho va Ten", "Tuoi", "Email", "SDT");
+    printf("\n|-----|--------------------|----------|--------------------|--------------------|");
+
+    while (fread(&t, sizeof(Teacher), 1, file) == 1) { 
+        hasData = 1;
+        printf("\n|%-5d|%-20s|%-10d|%-20s|%-20s|",
+               t.teacherId, t.name, t.age, t.email, t.phone);
+        printf("\n|-----|--------------------|----------|--------------------|--------------------|");
+    }
+    
+    fclose(file);
+    
+    if (!hasData) {
+        printf("\nKhông có giao vien nào trong danh sách.\n");
+    }
+
+    pressBToExit();
+}
+
+
+void editTeacher() {
+	 system(CLEAR_SCREEN);
+    FILE *file = fopen("teacher.bin", "rb");
+    if (!file) {
+        printf("Khong co du lieu giao vien!\n");
+        return;
+    }
+    
+    FILE *tempFile = fopen("temp.bin", "wb");
+    if (!tempFile) {
+        fclose(file);
+        perror("Loi tao file moi");
+        return;
+    }
+
+    int id, found = 0;
+    printf("Nhap ID giao vien can sua: ");
+    scanf("%d", &id);
+    getchar();
+
+    Teacher t;	
+    while (fread(&t, sizeof(Teacher), 1, file)) {
+        if (t.teacherId == id) {
+            found = 1;
+            printf("Nhap ten: ");
+            fgets(t.name, sizeof(t.name), stdin);
+            t.name[strcspn(t.name, "\n")] = '\0';
+
+            printf("Nhap tuoi: ");
+            scanf("%d", &t.age);
+            getchar();
+
+            printf("Nhap email: ");
+            fgets(t.email, sizeof(t.email), stdin);
+            t.email[strcspn(t.email, "\n")] = '\0';
+
+            printf("Nhap SDT: ");
+            fgets(t.phone, sizeof(t.phone), stdin);
+            t.phone[strcspn(t.phone, "\n")] = '\0';
+        }
+        fwrite(&t, sizeof(Teacher), 1, tempFile);
+    }
+
+    fclose(file);
+    fclose(tempFile);
+
+    remove("teacher.bin");
+    rename("temp.bin", "teacher.bin");
+
+    if (found) {
+        printf("Da thay doi thong tinh giao vien!\n");
+    } else {
+        printf("ID giao vien khong tim thay!\n");
+    }
+    pressBToExit();
+}
+
+void deleteTeacher() {
+	 system(CLEAR_SCREEN);
+    FILE *file = fopen("teacher.bin", "rb");
+    if (!file) {
+        printf("Khong co du lieu giao vien!\n");
+        return;
+    }
+
+    FILE *tempFile = fopen("temp.bin", "wb");
+    if (!tempFile) {
+        fclose(file);
+        perror("Loi tao file moi");
+        return;
+    }
+
+    int id, found = 0;
+    printf("Nhap ID giao vien can xoa: ");
+    scanf("%d", &id);
+    getchar();
+
+    Teacher t;
+    while (fread(&t, sizeof(Teacher), 1, file)) {
+        if (t.teacherId == id) {
+            found = 1;
+            printf("Da xoa ID %d thanh cong!\n", id);
+            continue;
+        }
+        fwrite(&t, sizeof(Teacher), 1, tempFile);
+    }
+
+    fclose(file);
+    fclose(tempFile);
+
+    remove("teacher.bin");
+    rename("temp.bin", "teacher.bin");
+
+    if (!found) {
+        printf("Khong tim thay ID giao vien!\n");
+    }
+    pressBToExit();
+}
+
+void searchTeacherByName() {
+    system(CLEAR_SCREEN);
+    FILE *file = fopen("teacher.bin", "rb");
+	if (file == NULL) {
+    printf("Loi khong the mo file!\n");
+    pressBToExit();
+    return;
+}
+
+
+    char searchName[50];
+    printf("Nhap ten giao vien can tim: ");
+    fgets(searchName, sizeof(searchName), stdin);
+    searchName[strcspn(searchName, "\n")] = '\0';  
+
+    Teacher t;
+    int found = 0;
+
+    printf("\n|-----|--------------------|----------|--------------------|--------------------|");
+    printf("\n|%-5s|%-20s|%-10s|%-20s|%-20s|", "ID", "Ho va Ten", "Tuoi", "Email", "SÐT");
+    printf("\n|-----|--------------------|----------|--------------------|--------------------|");
+
+    while (fread(&t, sizeof(Teacher), 1, file) == 1) {  
+        if (strstr(t.name, searchName) != NULL) { 
+            found = 1;
+            printf("\n|%-5d|%-20s|%-10d|%-20s|%-20s|", t.teacherId, t.name, t.age, t.email, t.phone);
+            printf("\n|-----|--------------------|----------|--------------------|--------------------|");
+        }
+    }
+
+    if (!found) {
+        printf("\nKhông tìm thay giao vien nao co ten \"%s\"!\n", searchName);
+    }
+
+    fclose(file);
+    pressBToExit();
+}
+
+int compareTeacherAZ(const void *a, const void *b) {
+    Teacher *s1 = (Teacher *)a;
+    Teacher *s2 = (Teacher *)b;
+    return strcmp(s1->name, s2->name);
+}
+
+
+int compareTeacherZA(const void *a, const void *b) {
+    return compareAZ(b, a);
+}
+
+
+void sortsTeacherAZ() {
+    system(CLEAR_SCREEN);
+    FILE *file = fopen("teacher.bin", "rb");
+    if (!file) {
+        printf("Khomg co du lieu giao vien!\n");
+        pressBToExit();
+        return;
+    }
+
+    Teacher teachers[100]; // Khai báo m?ng
+    int count = 0;
+
+    while (fread(&teachers[count], sizeof(Teacher), 1, file)) {
+        count++;
+    }
+    fclose(file);
+
+    if (count == 0) {
+        printf("Danh sach giao vien truong!\n");
+        pressBToExit();
+        return;
+    }
+
+    qsort(teachers, count, sizeof(Teacher), compareAZ);
+
+    printf("\n|-----|--------------------|----------|--------------------|--------------------|");
+    printf("\n|%-5s|%-20s|%-10s|%-20s|%-20s|", "ID", "H? và Tên", "Tu?i", "Email", "SÐT");
+    printf("\n|-----|--------------------|----------|--------------------|--------------------|");
+	int i=0;
+    for ( i = 0; i < count; i++) {
+        printf("\n|%-5d|%-20s|%-10d|%-20s|%-20s|",
+               teachers[i].teacherId, teachers[i].name, teachers[i].age, teachers[i].email, teachers[i].phone);
+        printf("\n|-----|--------------------|----------|--------------------|--------------------|");
+    }
+
+    pressBToExit();
+}
+
+
+
+void sortsTeacherZA() {
+    system(CLEAR_SCREEN);
+    FILE *file = fopen("teacher.bin", "rb");
+    if (!file) {
+        printf("Khong co du lieu giao vien!\n");
+        pressBToExit();
+        return;
+    }
+
+    Teacher teachers[100]; 
+    int count = 0;
+
+    while (fread(&teachers[count], sizeof(Teacher), 1, file)) {
+        count++;
+    }
+    fclose(file);
+
+    if (count == 0) {
+        printf("Danh sach giao vien truong\n");
+        pressBToExit();
+        return;
+    }
+
+    qsort(teachers, count, sizeof(Teacher), compareZA);
+
+    printf("\n|-----|--------------------|----------|--------------------|--------------------|");
+    printf("\n|%-5s|%-20s|%-10s|%-20s|%-20s|", "ID", "Ho va Ten", "Tuoi", "Email", "SÐT");
+    printf("\n|-----|--------------------|----------|--------------------|--------------------|");
+	int i;
+    for ( i = 0; i < count; i++) {
+        printf("\n|%-5d|%-20s|%-10d|%-20s|%-20s|",
+               teachers[i].teacherId, teachers[i].name, teachers[i].age, teachers[i].email, teachers[i].phone);
+        printf("\n|-----|--------------------|----------|--------------------|--------------------|");
+    }
+
+    pressBToExit();
 }
 
 
