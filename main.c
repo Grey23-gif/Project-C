@@ -26,19 +26,53 @@ int main()
 	switch (choice_2)
 	{
 		case 1:
+		do
+		{
 		showMenuTeacher();
-		scanf("%d",&choice);
+		scanf("%d",&choice_3);
 		getchar();
 		system(CLEAR_SCREEN);
 		switch(choice_3)
 		{
 			case 1:
-			break;
+				addTeacher();
+				break;
 			case 2:
-			break;
+				displayTeachers();
+				break;
 			case 3:
-			break;
+				editTeacher();
+				break;
+			case 4:
+				deleteTeacher();
+				break;
+			case 5:
+				searchTeacherByName();
+				break;
+			case 6:
+				{
+						char choice_4;
+						printf("[A].Sort names from a-z\n");
+						printf("[B].Sort names from z-a\n");
+						printf("Your choice: ");
+						scanf("%c",&choice_4);
+						getchar(); 
+						if (choice_4 == 'A' || choice_4 == 'a') 
+							{
+                    			sortsTeacherAZ();
+               				 } 
+						else if (choice_4 == 'B' || choice_4 == 'b') 
+							{
+                   				 sortsTeacherZA();
+                			} else {
+                   		 printf("Sai lua chon!\n");
+              				  }
+				break;
+				}
+			case 7:
+				break;
 		}
+		}while(choice_3!=8);
 		break;
 		case 2:
 		do

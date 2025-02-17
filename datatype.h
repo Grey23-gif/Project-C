@@ -12,7 +12,7 @@ typedef struct
 	int age;
 	char email[40];
 	char password[30];
-	char phone[10];
+	char phone[12];
 } Student;
 
 typedef struct  
@@ -30,7 +30,7 @@ typedef struct
 	int age;
 	bool gender;
 	char email[40];
-	char phone[10];
+	char phone[12];
 	char password[30];
 	Classroom classrooms[5];
 } Teacher;
