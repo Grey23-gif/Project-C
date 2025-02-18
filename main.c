@@ -5,6 +5,8 @@
 #include "function.h"
 #include "datatype.h"
 
+
+
 #ifdef _WIN32
     #define CLEAR_SCREEN "cls"
 #else
@@ -16,6 +18,16 @@ int main()
 	int choice;
 	int choice_2;
 	int choice_3;
+	int choice_4;
+	do
+	{
+		showMenuLogin();
+		scanf("%d",&choice_4);
+		switch(choice_4)
+		{
+			case 1:
+				login();
+		
 	do
 	{
 	showMenuMain();
@@ -69,10 +81,8 @@ int main()
               				  }
 				break;
 				}
-			case 7:
-				break;
 		}
-		}while(choice_3!=8);
+		}while(choice_3!=7);
 		break;
 		case 2:
 		do
@@ -124,10 +134,13 @@ int main()
 			}
 		} while(choice!=7);
 		break;
-		case 3:
-		break;
 	}
-	}while(choice_2!=4);
-
+	}while(choice_2!=3);
+	break;
+		case 2:
+				registerAccount();
+				break;
+		}
+	}while(choice_4!=3);
 	return 0;
 }

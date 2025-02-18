@@ -24,8 +24,8 @@ void showMenuTeacher() 	{
     printf("[4]. Delete a teacher.\n");
     printf("[5]. Search a teacher.\n");
     printf("[6]. Sort teacher by name.\n");
-    printf("[7]. Add class for teacher.\n");
-    printf("[8]. Exit.\n");
+    printf("[7]. Exit.\n");
+    printf("============================\n");
     printf("Enter your choice: ");
 }
 
@@ -216,7 +216,7 @@ void displayTeachers() {
     printf("\n|%-5s|%-20s|%-10s|%-40s|%-20s|", "ID", "Ho va Ten", "Tuoi", "Email", "SDT");
     printf("\n|-----|--------------------|----------|----------------------------------------|--------------------|");
 
-    while (fread(&t, sizeof(Teacher), 1, file) == 1) { 
+    while (fread(&t, sizeof(Student), 1, file) == 1) { 
         hasData = 1;
         printf("\n|%-5d|%-20s|%-10d|%-40s|%-20s|",
                t.teacherId, t.name, t.age, t.email, t.phone);

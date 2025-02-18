@@ -17,13 +17,6 @@ typedef struct
 
 typedef struct  
 {
-	char classroomId[10];
-	char teacherId[10];
-	char classroomName[10];
-} Classroom;
-
-typedef struct  
-{
 	int teacherId;
 	char classroomId[10];
 	char name[25];
@@ -32,8 +25,13 @@ typedef struct
 	char email[40];
 	char phone[12];
 	char password[30];
-	Classroom classrooms[5];
 } Teacher;
+
+typedef struct 
+{
+    char username[50];
+    char password[50];
+} AdminData;
 
 #endif
 

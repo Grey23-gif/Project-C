@@ -21,6 +21,7 @@ void showMenuMain() 	{
     printf("[2]. Student Menu.\n");
     printf("[3]. Classroom Menu.\n");
     printf("[4]. Exit.\n");
+    printf("============================\n");
     printf("Enter your choice: ");
 }
 
@@ -36,13 +37,14 @@ void showMenuStudent() 	{
     printf("[5]. Search a student.\n");
     printf("[6]. Sort students by name.\n");
     printf("[7]. Exit.\n");
+    printf("============================\n");
     printf("Enter your choice: ");
 }
 
 
 void pressBToExit() {
     char ch;
-    printf("\nPress 'B' to go back to the menu...");
+    printf("\nPress 'B' to continue...");
     while ((ch = getchar()) != 'B' && ch != 'b' && ch != '\n');
 }
 
