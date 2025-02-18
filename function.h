@@ -11,8 +11,9 @@ void searchStudentByName();
 void pressAnyKeyToExit();
 void sortsAZ();
 void sortsZA();
-int compareAZ(const void *a, const void *b);
-int compareZA(const void *a, const void *b);
+int compareAZ();
+int compareZA();
+const char* getLastName();
 
 void showMenuMain();
 void addTeacher();
@@ -22,6 +23,6 @@ void editTeacher();
 void searchTeacherByName();
 void sortsTeacherAZ();
 void sortsTeacherZA();
-int compareTeacherAZ(const void *a, const void *b);
-int compareTeacherZA(const void *a, const void *b);
+int compareTeacherAZ();
+int compareTeacherZA();
 

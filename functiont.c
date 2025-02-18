@@ -355,15 +355,32 @@ void searchTeacherByName() {
     pressBToExit();
 }
 
-int compareTeacherAZ(const void *a, const void *b) {
-    Teacher *s1 = (Teacher *)a;
-    Teacher *s2 = (Teacher *)b;
-    return strcmp(s1->name, s2->name);
+
+	int compareTeacherAZ(Teacher arr[], int n) {
+    int i, j;
+    for (i = 0; i < n - 1; i++) {
+        for (j = 0; j < n - i - 1; j++) {
+            if (strcmp(getLastName(arr[j].name), getLastName(arr[j + 1].name)) > 0) {
+                Teacher temp = arr[j];
+                arr[j] = arr[j + 1];
+                arr[j + 1] = temp;
+            }
+        }
+    }
 }
 
 
-int compareTeacherZA(const void *a, const void *b) {
-    return compareAZ(b, a);
+	int compareTeacherZA(Teacher arr[], int n) {
+  	int i, j;
+    for (i = 0; i < n - 1; i++) {
+        for (j = 0; j < n - i - 1; j++) {
+            if (strcmp(getLastName(arr[j].name), getLastName(arr[j + 1].name)) < 0) {
+                Teacher temp = arr[j];
+                arr[j] = arr[j + 1];
+                arr[j + 1] = temp;
+            }
+        }
+    }
 }
 
 
@@ -376,7 +393,7 @@ void sortsTeacherAZ() {
         return;
     }
 
-    Teacher teachers[100]; // Khai báo m?ng
+    Teacher teachers[100]; // Khai báo mang
     int count = 0;
 
     while (fread(&teachers[count], sizeof(Teacher), 1, file)) {
@@ -390,10 +407,10 @@ void sortsTeacherAZ() {
         return;
     }
 
-    qsort(teachers, count, sizeof(Teacher), compareAZ);
+    compareTeacherAZ(teachers,count);
 
     printf("\n|-----|--------------------|----------|----------------------------------------|--------------------|");
-    printf("\n|%-5s|%-20s|%-10s|%-40s|%-20s|", "ID", "Ho va ten", "Tuoi", "Email", "SDT");
+    printf("\n|%-5s|%-20s|%-10s|%-40s|%-20s|", "ID", "Ho va Ten", "Tuoi", "Email", "SDT");
     printf("\n|-----|--------------------|----------|----------------------------------------|--------------------|");
 	int i=0;
     for ( i = 0; i < count; i++) {
@@ -430,17 +447,19 @@ void sortsTeacherZA() {
         return;
     }
 
-    qsort(teachers, count, sizeof(Teacher), compareZA);
+   compareTeacherZA(teachers,count);
 
-   	printf("\n|-----|--------------------|----------|----------------------------------------|--------------------|");
-    printf("\n|%-5s|%-20s|%-10s|%-40s|%-20s|", "ID", "Ho va ten", "Tuoi", "Email", "SDT");
+    printf("\n|-----|--------------------|----------|----------------------------------------|--------------------|");
+    printf("\n|%-5s|%-20s|%-10s|%-40s|%-20s|", "ID", "Ho va Ten", "Tuoi", "Email", "SDT");
     printf("\n|-----|--------------------|----------|----------------------------------------|--------------------|");
 	int i;
     for ( i = 0; i < count; i++) {
         printf("\n|%-5d|%-20s|%-10d|%-40s|%-20s|",
                teachers[i].teacherId, teachers[i].name, teachers[i].age, teachers[i].email, teachers[i].phone);
-       printf("\n|-----|--------------------|----------|----------------------------------------|--------------------|");
+        printf("\n|-----|--------------------|----------|----------------------------------------|--------------------|");
     }
 
     pressBToExit();
+
 }
+

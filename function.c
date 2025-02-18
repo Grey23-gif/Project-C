@@ -371,16 +371,37 @@ void searchStudentByName() {
     fclose(file);
     pressBToExit();
 }
+	//Ham lay ten rieng
+	const char* getLastName(const char *fullName) {
+    const char *lastSpace = strrchr(fullName, ' '); //Tim khoang trang cuoi cung
+    return (lastSpace) ? lastSpace + 1 : fullName;  //Neu co lay phan sau khong thi ca chuoi
+	}	
 
-int compareAZ(const void *a, const void *b) {
-    Student *s1 = (Student *)a;
-    Student *s2 = (Student *)b;
-    return strcmp(s1->name, s2->name);
+	int compareAZ(Student arr[], int n) {
+    int i, j;
+    for (i = 0; i < n - 1; i++) {
+        for (j = 0; j < n - i - 1; j++) {
+            if (strcmp(getLastName(arr[j].name), getLastName(arr[j + 1].name)) > 0) {
+                Student temp = arr[j];
+                arr[j] = arr[j + 1];
+                arr[j + 1] = temp;
+            }
+        }
+    }
 }
 
 
-int compareZA(const void *a, const void *b) {
-    return compareAZ(b, a);
+	int compareZA(Student arr[], int n) {
+  	int i, j;
+    for (i = 0; i < n - 1; i++) {
+        for (j = 0; j < n - i - 1; j++) {
+            if (strcmp(getLastName(arr[j].name), getLastName(arr[j + 1].name)) < 0) {
+                Student temp = arr[j];
+                arr[j] = arr[j + 1];
+                arr[j + 1] = temp;
+            }
+        }
+    }
 }
 
 
@@ -407,11 +428,11 @@ void sortsAZ() {
         return;
     }
 
-    qsort(students, count, sizeof(Student), compareAZ);
+    compareAZ(students,count);
 
     printf("\n|-----|--------------------|----------|----------------------------------------|--------------------|");
-    printf("\n|%-5s|%-20s|%-10s|%-20s|%-20s|", "ID", "Ho va Ten", "Tuoi", "Email", "SDT");
-    printf("\n|-----|--------------------|----------|--------------------|--------------------|");
+    printf("\n|%-5s|%-20s|%-10s|%-40s|%-20s|", "ID", "Ho va Ten", "Tuoi", "Email", "SDT");
+    printf("\n|-----|--------------------|----------|----------------------------------------|--------------------|");
 	int i=0;
     for ( i = 0; i < count; i++) {
         printf("\n|%-5d|%-20s|%-10d|%-40s|%-20s|",
@@ -447,11 +468,11 @@ void sortsZA() {
         return;
     }
 
-    qsort(students, count, sizeof(Student), compareZA);
+   compareZA(students,count);
 
     printf("\n|-----|--------------------|----------|----------------------------------------|--------------------|");
-    printf("\n|%-5s|%-20s|%-10s|%-20s|%-20s|", "ID", "Ho va Ten", "Tu?i", "Email", "SÐT");
-    printf("\n|-----|--------------------|----------|--------------------|--------------------|");
+    printf("\n|%-5s|%-20s|%-10s|%-40s|%-20s|", "ID", "Ho va Ten", "Tuoi", "Email", "SDT");
+    printf("\n|-----|--------------------|----------|----------------------------------------|--------------------|");
 	int i;
     for ( i = 0; i < count; i++) {
         printf("\n|%-5d|%-20s|%-10d|%-40s|%-20s|",
