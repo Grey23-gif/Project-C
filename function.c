@@ -14,7 +14,7 @@
 
 void showMenuMain() 	{
     system(CLEAR_SCREEN);
-    printf("\n============================\n");
+    printf("\n\033[32m============================\n");
     printf("%17s\n", "MENU");
     printf("============================\n");
     printf("[1]. Teacher Menu.\n");
@@ -49,7 +49,7 @@ void pressBToExit() {
 void inputStudentInfo(Student *s, FILE *file){
     int check;
     Student temp;
-	
+		
 	// Nhap ten
         do
         {
@@ -273,21 +273,7 @@ void editStudent() {
     while (fread(&s, sizeof(Student), 1, file)) {
         if (s.studentId == id) {
             found = 1;
-            printf("Nhap ten: ");
-            fgets(s.name, sizeof(s.name), stdin);
-            s.name[strcspn(s.name, "\n")] = '\0';
-
-            printf("Nhap tuoi: ");
-            scanf("%d", &s.age);
-            getchar();
-
-            printf("Nhap email: ");
-            fgets(s.email, sizeof(s.email), stdin);
-            s.email[strcspn(s.email, "\n")] = '\0';
-
-            printf("Nhap SDT: ");
-            fgets(s.phone, sizeof(s.phone), stdin);
-            s.phone[strcspn(s.phone, "\n")] = '\0';
+            inputStudentInfo(&s, file);
         }
         fwrite(&s, sizeof(Student), 1, tempFile);
     }
@@ -367,8 +353,8 @@ void searchStudentByName() {
     int found = 0;
 
     printf("\n|-----|--------------------|----------|----------------------------------------|--------------------|");
-    printf("\n|%-5s|%-20s|%-10s|%-20s|%-20s|", "ID", "Ho va Ten", "Tuoi", "Email", "SÐT");
-    printf("\n|-----|--------------------|----------|--------------------|--------------------|");
+    printf("\n|%-5s|%-20s|%-10s|%-40s|%-20s|", "ID", "Ho va Ten", "Tuoi", "Email", "SDT");
+    printf("\n|-----|--------------------|----------|----------------------------------------|--------------------|");
 
     while (fread(&s, sizeof(Student), 1, file) == 1) {  
         if (strstr(s.name, searchName) != NULL) { 
@@ -407,7 +393,7 @@ void sortsAZ() {
         return;
     }
 
-    Student students[100]; // Khai báo m?ng
+    Student students[100]; // Khai báo mang
     int count = 0;
 
     while (fread(&students[count], sizeof(Student), 1, file)) {

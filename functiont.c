@@ -29,77 +29,71 @@ void showMenuTeacher() 	{
     printf("Enter your choice: ");
 }
 
-void addTeacher() {
-    system(CLEAR_SCREEN);
-    FILE *file = fopen("teacher.bin", "ab+"); // Mo file doc và ghi
-    if (!file) {
-        perror("Error opening file");
-        exit(1);
-    }
-    
-    Teacher t;
+void inputTeacherInfo(Teacher *t, FILE *file){
     int check;
     Teacher temp;
-
-    do {
-        check = 1; //Vi du la du lieu hop le
-        // Nhap ID
-        printf("Nhap ID: ");
-        if (scanf("%d", &t.teacherId) != 1 || t.teacherId <= 0) 
-		{
-            printf("ID khong hop le.\n");
-            check = 0;
-            while (getchar() != '\n');
-            continue;
-        }
-        getchar(); // Xóa bo no dem
-        
-        //ktra ID co lap k
-        
-        rewind(file); //Dua con tro file ve dau
-        while (fread(&temp, sizeof(Teacher), 1, file)) 
-		{
-            if (temp.teacherId == t.teacherId) 
-			{
-                printf("ID da ton tai.\n");
-                check = 0;
-            }
-		}
-		}while(!check);
-        // Nhap ten
+		
+	// Nhap ten
+        do
+        {
         printf("Nhap ten: ");
-        fgets(t.name, sizeof(t.name), stdin);
-        t.name[strcspn(t.name, "\n")] = '\0'; 
+        fgets(t->name, sizeof(t->name), stdin);
+        t->name[strcspn(t->name, "\n")] = '\0'; 
+        if (strlen(t->name) == 0) {
+            printf("Khong de thong tin trong.\n");
+        }
+
+    	}while (strlen(t->name) == 0); 
 
         // Nhap tuoi
-        do
-		{
-		check=1;
+        do {
+        check=1;
+        char input[10];
         printf("Nhap tuoi: ");
-        if (scanf("%d", &t.age) != 1 || t.age <= 0) {
-            printf("Tuoi khong hop le.\n");
-            check = 0;
+        fgets(input, sizeof(input), stdin);
+
+        input[strcspn(input, "\n")] = 0;
+
+        if (strlen(input) == 0) {
+            printf("Khong duoc de trong thong tin.\n");
+            check=0;
+            continue;
         }
-        getchar();
-    	}while(!check);
+
+        //chuyen chuoi thanh so nguyen
+        if (sscanf(input, "%d", &t->age) != 1 || t->age <= 0) {
+            printf("Vui long nhap lai.\n");
+            check=0;
+            continue;
+        }
+
+        break; 
+
+    } while (!check);
 		
 		do
 		{
 		check=1;
-       //nhap email va ktra email
+       	//nhap email va ktra email
         printf("Nhap email: ");
-        fgets(t.email, sizeof(t.email), stdin);
-        t.email[strcspn(t.email, "\n")] = '\0';
-        if (strlen(t.email) == 0 || strstr(t.email,"@gmail.com") == NULL) {
-            printf("Email không hop le?!\n");
+        fgets(t->email, sizeof(t->email), stdin);
+        t->email[strcspn(t->email, "\n")] = '\0';
+        if (strlen(t->email) == 0 || strlen(t->email) <13 ||strstr(t->email,"@gmail.com") == NULL)
+		{
+            printf("Email khong hop le?!\n");
             check = 0;
+        }
+        if (strcmp(t->email + strlen(t->email) - 10, "@gmail.com") != 0) {
+            printf("Email phai ket thuc bang @gmail.com .\n");
+            check = 0;
+            continue;
         }
 
         // Kiem tra email co trung khong
         rewind(file);
         while (fread(&temp, sizeof(Teacher), 1, file)) 
 		{
-            if (strcmp(temp.email, t.email) == 0) 
+            if (strcmp(temp.email, t->email) == 0) 
 			{
                 printf("Email da ton tai!\n");
                 check = 0;
@@ -111,28 +105,30 @@ void addTeacher() {
         //Nhap so dien thoat va ktra co hop le k
         do
         {
+        check=1;
         printf("Nhap so dien thoai: ");
-        fgets(t.phone, sizeof(t.phone), stdin);
-        t.phone[strcspn(t.phone, "\n")] = '\0';
-        int length = strlen(t.phone);
-        if (length < 9 || length > 11) {
+        fgets(t->phone, sizeof(t->phone), stdin);
+        t->phone[strcspn(t->phone, "\n")] = '\0';
+        
+        int length = strlen(t->phone);
+        if (length !=10) {
             printf("So dien thoai khong hop le\n");
             check = 0;
         }
         int i;	
         for (i = 0; i < length; i++) {
-        if (!isdigit(t.phone[i])) {
+        if (!isdigit(t->phone[i])) {
             printf("So dien thoai chi duoc chua cac chu so (0-9).\n");
             check=0;
             break;
         }
     	}
 		
-       //ktra xem SÐT có trùng không
+       //ktra xem SDT có trùng không
         rewind(file);
         while (fread(&temp, sizeof(Teacher), 1, file))
 		 {
-            if (strcmp(temp.phone, t.phone) == 0) 
+            if (strcmp(temp.phone, t->phone) == 0) 
 			{
                 printf("So dien thoat da ton tai!\n");
                 check = 0;
@@ -140,8 +136,60 @@ void addTeacher() {
             }
         }
         }while(!check);
+	
+}
 
-   
+
+void addTeacher() {
+    system(CLEAR_SCREEN);
+    FILE *file = fopen("teacher.bin", "ab+"); // Mo file doc va ghi
+    if (!file) {
+        perror("Error opening file");
+        exit(1);
+    }
+    
+    Teacher t;
+    int check;
+    Teacher temp;	
+    do {
+    char input[10]; //luu du lieu
+    check = 1; // Gia su du lieu hop li
+
+    // Nhap ID
+    printf("Nhap ID: ");
+    fgets(input, sizeof(input), stdin);
+
+    input[strcspn(input, "\n")] = 0;
+
+    // Kiem tra xem nguoi dung co nhap ID
+    if (strlen(input) == 0) {
+        printf("Khong duoc de thong tin trong.\n");
+        check = 0;
+        continue;
+    }
+
+    //Chuyen input thanh so nguyen
+    if (sscanf(input, "%d", &t.teacherId) != 1 || t.teacherId <= 0) 
+	{
+        printf("Vui long nhap lai ID.\n");
+        check = 0;
+        continue;
+    }
+
+    //Check xem ID co trung khong
+    rewind(file); //dua con tro file ve dau
+    while (fread(&temp, sizeof(Teacher), 1, file)) {
+        if (temp.teacherId == t.teacherId) {
+            printf("ID da ton tai.\n");
+            check = 0;
+            break;
+        }
+    }
+
+	} while (!check);
+	
+	inputTeacherInfo(&t, file);
+	
     // Luu thông tin hop le vào file
     fwrite(&t, sizeof(Teacher), 1, file);
     fclose(file);
@@ -149,6 +197,7 @@ void addTeacher() {
     printf("Giao vien duoc them thanh cong.\n");
     pressBToExit();
 }
+
 
 
 void displayTeachers() {
@@ -177,7 +226,7 @@ void displayTeachers() {
     fclose(file);
     
     if (!hasData) {
-        printf("\nKhông có giao vien nào trong danh sách.\n");
+        printf("\nKhong co giao vien nao trong danh sach.\n");
     }
 
     pressBToExit();
@@ -208,21 +257,7 @@ void editTeacher() {
     while (fread(&t, sizeof(Teacher), 1, file)) {
         if (t.teacherId == id) {
             found = 1;
-            printf("Nhap ten: ");
-            fgets(t.name, sizeof(t.name), stdin);
-            t.name[strcspn(t.name, "\n")] = '\0';
-
-            printf("Nhap tuoi: ");
-            scanf("%d", &t.age);
-            getchar();
-
-            printf("Nhap email: ");
-            fgets(t.email, sizeof(t.email), stdin);
-            t.email[strcspn(t.email, "\n")] = '\0';
-
-            printf("Nhap SDT: ");
-            fgets(t.phone, sizeof(t.phone), stdin);
-            t.phone[strcspn(t.phone, "\n")] = '\0';
+            inputTeacherInfo(&t,file);
         }
         fwrite(&t, sizeof(Teacher), 1, tempFile);
     }
@@ -302,9 +337,8 @@ void searchTeacherByName() {
     int found = 0;
 
     printf("\n|-----|--------------------|----------|----------------------------------------|--------------------|");
-    printf("\n|%-5s|%-20s|%-10s|%-40s|%-20s|", "ID", "Ho va Ten", "Tuoi", "Email", "SÐT");
+    printf("\n|%-5s|%-20s|%-10s|%-40s|%-20s|", "ID", "Ho va Ten", "Tuoi", "Email", "SDT");
     printf("\n|-----|--------------------|----------|----------------------------------------|--------------------|");
-
     while (fread(&t, sizeof(Teacher), 1, file) == 1) {  
         if (strstr(t.name, searchName) != NULL) { 
             found = 1;
@@ -359,7 +393,7 @@ void sortsTeacherAZ() {
     qsort(teachers, count, sizeof(Teacher), compareAZ);
 
     printf("\n|-----|--------------------|----------|----------------------------------------|--------------------|");
-    printf("\n|%-5s|%-20s|%-10s|%-40s|%-20s|", "ID", "H? và Tên", "Tu?i", "Email", "SÐT");
+    printf("\n|%-5s|%-20s|%-10s|%-40s|%-20s|", "ID", "Ho va ten", "Tuoi", "Email", "SDT");
     printf("\n|-----|--------------------|----------|----------------------------------------|--------------------|");
 	int i=0;
     for ( i = 0; i < count; i++) {
@@ -398,8 +432,8 @@ void sortsTeacherZA() {
 
     qsort(teachers, count, sizeof(Teacher), compareZA);
 
-   printf("\n|-----|--------------------|----------|----------------------------------------|--------------------|");
-    printf("\n|%-5s|%-20s|%-10s|%-40s|%-20s|", "ID", "Ho va Ten", "Tuoi", "Email", "SÐT");
+   	printf("\n|-----|--------------------|----------|----------------------------------------|--------------------|");
+    printf("\n|%-5s|%-20s|%-10s|%-40s|%-20s|", "ID", "Ho va ten", "Tuoi", "Email", "SDT");
     printf("\n|-----|--------------------|----------|----------------------------------------|--------------------|");
 	int i;
     for ( i = 0; i < count; i++) {

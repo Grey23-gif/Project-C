@@ -2,6 +2,7 @@
 
 void showMenuStudent();
 void showMenuMain();
+void inputStudentInfo();
 void addStudent();
 void displayStudents();
 void deleteStudent();

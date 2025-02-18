@@ -109,13 +109,14 @@ OverrideBuildCmd=0
 BuildCmd=
 
 [Unit7]
-FileName=teacher.bin
-Folder=data
-Compile=0
-Link=0
+FileName=functiont.c
+Folder=src
+Compile=1
+Link=1
 Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
+CompileCpp=0
 
 [Unit8]
 FileName=student.bin
@@ -125,13 +126,14 @@ Link=0
 Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
+CompileCpp=0
 
 [Unit9]
-FileName=functiont.c
+FileName=teacher.bin
 CompileCpp=0
-Folder=src
-Compile=1
-Link=1
+Folder=data
+Compile=0
+Link=0
 Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
