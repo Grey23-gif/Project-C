@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <conio.h>
-#include "datatype.h"  // –?m b?o include datatype.h tru?c khi s? d?ng AdminData
+#include "datatype.h"  
 
 #define FILE_NAME "admin.bin"
 #ifdef _WIN32
@@ -50,7 +50,7 @@ void registerAccount() {
 	system(CLEAR_SCREEN);
     AdminData newAdmin;
 
-    // Nh?p thÙng tin t‡i kho?n
+    // Nh?p th√¥ng tin t√†i kho?n
     printf("\nDang ky tai khoan moi\n");
     printf("Nhap tai khoan: "); 
     scanf("%s", newAdmin.username);
@@ -58,7 +58,7 @@ void registerAccount() {
     getPassword(newAdmin.password); 
     printf("\n");
 	
-    // Ghi v‡o file
+    // Ghi v√†o file
     FILE *file = fopen(FILE_NAME, "wb");
     if (file) {
         fwrite(&newAdmin, sizeof(AdminData), 1, file);
